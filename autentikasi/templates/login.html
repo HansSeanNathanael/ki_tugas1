@@ -1,0 +1,9 @@
+<html>
+    <form action="/auth/login/" method="post">{% csrf_token %}
+        <label for="username">Username</label>
+        <input type="text" name="username" placeholder="Username" required>
+        <label for="password">Password</label>
+        <input type="password" name="password" placeholder="Password" required>
+        <button type="submit">Masuk</button>
+    </form>
+</html>
