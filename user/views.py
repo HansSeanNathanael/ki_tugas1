@@ -1,13 +1,13 @@
-import base64
+import base64, uuid
 
 from django.shortcuts import render
 from django.http.request import HttpRequest
-from django.http.response import HttpResponseRedirect
-from Crypto.Cipher import AES as AESCHIPHER
+from django.http.response import HttpResponseRedirect, HttpResponse
+from Crypto.Cipher import AES as AESCHIPHER, DES as DESCIPHER
 
 from autentikasi.models import User
 from ki_tugas1.views import Views
-from ki_tugas1.encryptor.aes import AES, StringBlock, StringDecryptBlock
+from ki_tugas1.encryptor.aes import AES, DES, StringBlock, StringDecryptBlock
 from ki_tugas1.commands.encryption_key import get_key
 from .models import File as FileModel
 from .forms.form_info_get import FormInfoGet
@@ -15,6 +15,8 @@ from .forms.form_info_post import FormInfoPost
 from ki_tugas1.commands.encryption_key import get_key
 
 # Create your views here.
+
+default_location_folder = './user/public/files/'
 
 class Info(Views):
     
@@ -88,7 +90,7 @@ class Info(Views):
             
     def encrypt(self, key : bytes, data : str, mode : any) -> bytes:
         aes = AES(key, mode)
-        data_block = StringBlock(data, 16)
+        data_block = StringBlock(data.encode(), 16)
         
         return aes.encrypt(data_block)
         
@@ -124,5 +126,51 @@ class File(Views):
         
     def post(self, request : HttpRequest, *args, **kwargs):
         user : User = request.user
-        daftar_file = FileModel.objects.filter(id_user=user.id)
-        pass
+        key = request.POST['key']
+        uploaded_file = request.FILES['upload_file']
+        
+        id = uuid.uuid4()
+        nama_file = uploaded_file.name
+        nama_file_fisik = uuid.uuid4()
+        FileModel.objects.create(id=id, id_user=user, nama_file=nama_file, nama_file_fisik=nama_file_fisik)
+
+        self.handle_uploaded_file(uploaded_file, nama_file_fisik, key.encode())
+        
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+    
+    def handle_uploaded_file(self, fi, name, key):
+        encryptor = DES(get_key(key, 8), DESCIPHER.MODE_CBC)
+        with open(default_location_folder + str(name), "wb+") as destination:
+            data = StringBlock(fi.read(), 8)
+            destination.write(encryptor.encrypt(data))
+                
+class Download(Views):
+    
+    def get(self, request : HttpRequest, *args, **kwargs):
+        user : User = request.user
+        id = request.GET['id']
+        key = request.GET['key']
+        
+        fi = FileModel.objects.filter(id=id).get()
+        
+        decryptor = DES(get_key(key.encode(), 8), DESCIPHER.MODE_CBC)
+        result = bytes()
+        with open(default_location_folder + str(fi.nama_file_fisik), "rb") as destination:
+            data = StringDecryptBlock(destination.read(), 8)
+            chunk =  decryptor.decrypt(data)
+            while chunk is not None:
+                result += chunk
+                chunk =  decryptor.decrypt(data)
+            
+        return HttpResponse(result, content_type='application/octet-stream')
+        
+        # kumpulan_file = []
+        # for fi in daftar_file:
+        #     kumpulan_file.append({
+        #         'nama_file' : fi.nama_file,
+        #         'id_file' : fi.id
+        #     })
+            
+        # return render(request, 'file\index.html', context={
+        #     'daftar_file' : kumpulan_file
+        # })

@@ -3,5 +3,6 @@ from . import views
 
 urlpatterns = [
     path('user/', views.Info().invoke),
-    path('file/', views.File().invoke)
+    path('file/', views.File().invoke),
+    path('download/', views.Download().invoke)
 ]
