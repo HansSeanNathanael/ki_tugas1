@@ -1,0 +1,26 @@
+<html>
+    <body>
+
+        <p>Uplaod File</p>
+        <form action="/info/user/" method="get">{% csrf_token %}
+            <label for="upload_file">Key Enkripsi</label>
+            <input type="file" name="upload_file" accept=".doc,.docx,.xls,.xlsx,.pdf" required>
+            <label for="key">Key Enkripsi</label>
+            <input type="password" name="key" placeholder="Key" required>
+            <button type="submit">Decrypt</button>
+        </form>
+        <br>
+        <p>Daftar File</p>
+        <ul>
+            {% for file in daftar_file %}
+            <li>
+                <p>Nama file: {{ file.nama_file }}</p>
+                <form action="/user/file/{{ file.id_file }}" method="get">
+                    <input type="password" name="key" required/>
+                    <button type="submit" formtarget="_blank"></button>
+                </form>
+            </li>
+            {% endfor %}
+        </ul>
+    </body>
+</html>

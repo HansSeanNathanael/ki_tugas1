@@ -12,11 +12,11 @@ class User(AbstractBaseUser):
     username = models.CharField(max_length=32, unique=True)
     password = models.CharField(max_length=64)
     
-    nama = models.CharField(max_length=64, default=None, blank=True, null=True)
-    email = models.EmailField(max_length=254, default=None, blank=True, null=True)
-    tanggal_lahir = models.DateField(default=None, blank=True, null=True)
+    nama = models.CharField(max_length=255, default=None, blank=True, null=True)
+    email = models.CharField(max_length=255, default=None, blank=True, null=True)
+    tanggal_lahir = models.CharField(max_length=255,default=None, blank=True, null=True)
     alamat = models.CharField(max_length=255, default=None, blank=True, null=True)
-    nomor_telepon = models.CharField(max_length=16, default=None, blank=True, null=True)
+    nomor_telepon = models.CharField(max_length=255, default=None, blank=True, null=True)
 
     USERNAME_FIELD = "username"
     REQUIRED_FIELDS = []

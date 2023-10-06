@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'autentikasi',
+    'user'
 ]
 
 MIDDLEWARE = [
@@ -54,6 +55,8 @@ MIDDLEWARE = [
 AUTHENTICATION_BACKENDS = [
     'autentikasi.backend.AuthBackend'
 ]
+
+AUTH_USER_MODEL = "autentikasi.User"
 
 ROOT_URLCONF = 'ki_tugas1.urls'
 

@@ -46,7 +46,7 @@ class FormInfoPost(forms.Form):
         max_length=255, required=True,
         validators=[
             RegexValidator(
-                regex=r'^\+?62?\d{9,15}$',
+                regex=r'^(\+62)?\d{12}$',
                 message="Nomor telepon harus dalam format +62812xxxx atau 0812xxxx."
             )
         ],

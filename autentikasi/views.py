@@ -21,7 +21,8 @@ class Login(Views):
             user = authenticate(request, username=username, password=password)
             if user is None:
                 return HttpResponseRedirect('/auth/login/')
-            return HttpResponseRedirect('/')
+            login(request, user)
+            return HttpResponseRedirect('/info/user/')
                 
             
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))

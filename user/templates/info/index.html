@@ -1,0 +1,37 @@
+<html>
+    <body>
+        <p>Data user</p>
+        <ul>
+            <li>Username: {{ username }}</li>
+            <li>Nama: {{ nama }}</li>
+            <li>Email: {{ email }}</li>
+            <li>Tanggal lahir: {{ tanggal_lahir }}</li>
+            <li>Alamat: {{ alamat }}</li>
+            <li>Nomor telepon: {{ nomor_telepon }}</li>
+        </ul>
+
+        <p>Dekripsi</p>
+        <form action="/info/user/" method="get">{% csrf_token %}
+            <label for="key">Key Enkripsi</label>
+            <input type="password" name="key" placeholder="Key" required>
+            <button type="submit">Decrypt</button>
+        </form>
+        <br>
+        <p>Ubah data</p>
+        <form action="/info/user/" method="post">{% csrf_token %}
+            <label for="key">Key Enkripsi</label>
+            <input type="password" name="key" placeholder="Key" required>
+            <label for="nama">Nama</label>
+            <input type="text" name="nama" placeholder="Nama" required>
+            <label for="email">Email</label>
+            <input type="email" name="email" placeholder="Email" required>
+            <label for="tanggal_lahir">Tanggal Lahir</label>
+            <input type="date" name="tanggal_lahir" placeholder="Lahir" required>
+            <label for="alamat">Alamat</label>
+            <input type="text" name="alamat" placeholder="Alamat" required>
+            <label for="nomor_telepon">Nomor Telepon</label>
+            <input type="text" name="nomor_telepon" placeholder="Nomor Telepon" required>
+            <button type="submit">Simpan</button>
+        </form>
+    </body>
+</html>
