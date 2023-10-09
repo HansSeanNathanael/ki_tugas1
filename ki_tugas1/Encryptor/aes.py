@@ -1,7 +1,7 @@
 import io
 import sys
 import collections
-from Crypto.Cipher import AES as AESCIPHER, DES as DESCIPHER
+from Crypto.Cipher import AES as AESCIPHER, DES as DESCIPHER, ARC4
 
 from ki_tugas1.commands.encryption_key import get_key
 
@@ -99,11 +99,11 @@ class AES:
         self.decrypt_queue = None
         
         if type == AESCIPHER.MODE_CBC:
-            self.encryptor = AESCIPHER.new(key, AESCIPHER.MODE_CBC, get_key(key, 8))
+            self.encryptor = AESCIPHER.new(key, AESCIPHER.MODE_CBC, get_key(key, 16))
         elif type == AESCIPHER.MODE_CFB:
-            self.encryptor = AESCIPHER.new(key, AESCIPHER.MODE_CFB, get_key(key, 8), 64)
+            self.encryptor = AESCIPHER.new(key, AESCIPHER.MODE_CFB, get_key(key, 16), 64)
         elif type == AESCIPHER.MODE_OFB:
-            self.encryptor = AESCIPHER.new(key, AESCIPHER.MODE_OFB, get_key(key, 8))
+            self.encryptor = AESCIPHER.new(key, AESCIPHER.MODE_OFB, get_key(key, 16))
         elif type == AESCIPHER.MODE_CTR:
             self.encryptor = AESCIPHER.new(key, AESCIPHER.MODE_CTR)
     
@@ -187,3 +187,13 @@ class DES:
             data = data[:panjang_data]
             
         return data
+    
+class RC4:
+    def __init__(self, key : bytes):
+        self.encryptor = ARC4.new(key)
+
+    def encrypt(self, data : bytes) -> bytes:
+        return self.encryptor.encrypt(data)
+    
+    def decrypt(self, data : bytes) -> bytes|None:
+        return self.encryptor.decrypt(data)

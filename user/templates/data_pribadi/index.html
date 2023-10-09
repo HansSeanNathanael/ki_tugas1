@@ -1,0 +1,28 @@
+<html>
+    <p>Tambah Data Pribadi</p>
+    <form action="" method="post">{% csrf_token %}
+        <label for="key">Key Enkripsi</label>
+        <input type="password" name="key" placeholder="Key" required>
+        <label for="nama_informasi">Nama Informasi</label>
+        <input type="text" name="nama_informasi" placeholder="Nama informasi" required>
+        <label for="isi_informasi">Isi Informasi</label>
+        <input type="text" name="isi_informasi" placeholder="Isi informasi" required>
+        <button type="submit">Simpan</button>
+    </form>
+    <br/>
+    <p>Daftar Data Pribadi</p>
+        <ul>
+            {% for data_pribadi in daftar_data_pribadi %}
+            <li>
+                <p>Nama Informasi: {{ data_pribadi.nama_informasi }}</p>
+                <p>Isi Informasi: {{ data_pribadi.isi_informasi }}</p>
+                <form action="" method="get">{% csrf_token %}
+                    <input type="text" name="id" value="{{ data_pribadi.id }}" hidden>
+                    <label for="key">Key Dekripsi</label>
+                    <input type="password" name="key" required/>
+                    <button type="submit">DECRYPT</button>
+                </form>
+            </li>
+            {% endfor %}
+        </ul>
+</html>
