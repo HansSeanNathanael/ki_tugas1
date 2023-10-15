@@ -14,6 +14,18 @@
         <form action="/info/user/" method="get">{% csrf_token %}
             <label for="key">Key Enkripsi</label>
             <input type="password" name="key" placeholder="Key" required>
+            <label for="enkripsi">Algoritma Dekripsi</label>
+            <select name="enkripsi" id="enkripsi">
+                <option value="aes-cbc" selected>AES CBC</option>
+                <option value="aes-cfb">AES CFB</option>
+                <option value="aes-ofb">AES OFB</option>
+                <option value="aes-ctr">AES CTR</option>
+                <option value="des-cbc">DES CBC</option>
+                <option value="des-cfb">DES CFB</option>
+                <option value="des-ofb">DES OFB</option>
+                <option value="des-ctr">DES CTR</option>
+                <option value="rc4">RC4</option>
+            </select>
             <button type="submit">Decrypt</button>
         </form>
         <br>
@@ -21,6 +33,18 @@
         <form action="/info/user/" method="post">{% csrf_token %}
             <label for="key">Key Enkripsi</label>
             <input type="password" name="key" placeholder="Key" required>
+            <label for="enkripsi">Algoritma Enkripsi</label>
+            <select name="enkripsi" id="enkripsi">
+                <option value="aes-cbc" selected>AES CBC</option>
+                <option value="aes-cfb">AES CFB</option>
+                <option value="aes-ofb">AES OFB</option>
+                <option value="aes-ctr">AES CTR</option>
+                <option value="des-cbc">DES CBC</option>
+                <option value="des-cfb">DES CFB</option>
+                <option value="des-ofb">DES OFB</option>
+                <option value="des-ctr">DES CTR</option>
+                <option value="rc4">RC4</option>
+            </select>
             <label for="nama">Nama</label>
             <input type="text" name="nama" placeholder="Nama" required>
             <label for="email">Email</label>

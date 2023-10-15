@@ -19,15 +19,25 @@ from ki_tugas1.commands.encryption_key import get_key
 
 default_location_folder = './user/public/files/'
 
-def encryptAES(key : bytes, data : str, mode : any) -> bytes:
+def encryptAES(key : bytes, data : bytes, mode : any) -> bytes:
     aes = AES(key, mode)
-    data_block = StringBlock(data.encode(), 16)
+    
+    data_block = None
+    if mode == AESCHIPHER.MODE_CTR:
+        data_block = StringBlock(data, None)
+    else:
+        data_block = StringBlock(data, 16)
     
     return aes.encrypt(data_block)
     
 def decryptAES(key : bytes, data : bytes, mode : any) -> bytes:
     aes = AES(key, mode)
-    data_block = StringDecryptBlock(data, 16)
+    data_block = None
+    if mode == AESCHIPHER.MODE_CTR:
+        data_block = StringDecryptBlock(data, None)
+    else:
+        data_block = StringDecryptBlock(data, 16)
+        
     result = bytes()
     while True:
         data = aes.decrypt(data_block)
@@ -37,14 +47,24 @@ def decryptAES(key : bytes, data : bytes, mode : any) -> bytes:
         result += data
     return result
 
-def encryptDES(key : bytes, data : str, mode : any) -> bytes:
+def encryptDES(key : bytes, data : bytes, mode : any) -> bytes:
     des = DES(key, mode)
-    data_block = StringBlock(data.encode(), 8)
+    data_block = None
+    if mode == DESCIPHER.MODE_CTR:
+        data_block = StringBlock(data, None)
+    else:
+        data_block = StringBlock(data, 8)
+    
     return des.encrypt(data_block)
 
 def decryptDES(key : bytes, data : bytes, mode : any) -> bytes:
     des = DES(key, mode)
-    data_block = StringDecryptBlock(data, 8)
+    data_block = None
+    if mode == DESCIPHER.MODE_CTR:
+        data_block = StringDecryptBlock(data, None)
+    else:
+        data_block = StringDecryptBlock(data, 8)
+        
     result = bytes()
     while True:
         data = des.decrypt(data_block)
@@ -61,7 +81,58 @@ def decryptRC4(key : bytes, data : bytes) -> bytes:
     rc4 = RC4(key)
     return rc4.decrypt(data)
 
+def encrypt(algoritma : str, key : str, data : bytes) -> bytes:
+    tipe_enkripsi = algoritma[:3]
+    if tipe_enkripsi == "aes":
+        mode = algoritma[4:]
+        if mode == "cbc":
+            return encryptAES(get_key(key.encode(), 16), data, AESCHIPHER.MODE_CBC)
+        elif mode == "cfb":
+            return encryptAES(get_key(key.encode(), 16), data, AESCHIPHER.MODE_CFB)
+        elif mode == "ofb":
+            return encryptAES(get_key(key.encode(), 16), data, AESCHIPHER.MODE_OFB)
+        elif mode == "ctr":
+            return encryptAES(get_key(key.encode(), 16), data, AESCHIPHER.MODE_CTR)
+    elif tipe_enkripsi == "des":
+        mode = algoritma[4:]
+        if mode == "cbc":
+            return encryptDES(get_key(key.encode(), 8), data, DESCIPHER.MODE_CBC)
+        elif mode == "cfb":
+            return encryptDES(get_key(key.encode(), 8), data, DESCIPHER.MODE_CFB)
+        elif mode == "ofb":
+            return encryptDES(get_key(key.encode(), 8), data, DESCIPHER.MODE_OFB)
+        elif mode == "ctr":
+            return encryptDES(get_key(key.encode(), 8), data, DESCIPHER.MODE_CTR)
+    elif tipe_enkripsi == "rc4":
+        return encryptRC4(get_key(key.encode(), 16), data)
+    return bytes()
 
+def decrypt(algoritma : str, key : str, data : bytes) -> bytes:
+    tipe_enkripsi = algoritma[:3]
+    if tipe_enkripsi == "aes":
+        mode = algoritma[4:]
+        if mode == "cbc":
+            return decryptAES(get_key(key.encode(), 16), data, AESCHIPHER.MODE_CBC)
+        elif mode == "cfb":
+            return decryptAES(get_key(key.encode(), 16), data, AESCHIPHER.MODE_CFB)
+        elif mode == "ofb":
+            return decryptAES(get_key(key.encode(), 16), data, AESCHIPHER.MODE_OFB)
+        elif mode == "ctr":
+            print(decryptAES(get_key(key.encode(), 16), data, AESCHIPHER.MODE_CTR))
+            return decryptAES(get_key(key.encode(), 16), data, AESCHIPHER.MODE_CTR)
+    elif tipe_enkripsi == "des":
+        mode = algoritma[4:]
+        if mode == "cbc":
+            return decryptDES(get_key(key.encode(), 8), data, DESCIPHER.MODE_CBC)
+        elif mode == "cfb":
+            return decryptDES(get_key(key.encode(), 8), data, DESCIPHER.MODE_CFB)
+        elif mode == "ofb":
+            return decryptDES(get_key(key.encode(), 8), data, DESCIPHER.MODE_OFB)
+        elif mode == "ctr":
+            return decryptDES(get_key(key.encode(), 8), data, DESCIPHER.MODE_CTR)
+    elif tipe_enkripsi == "rc4":
+        return decryptRC4(get_key(key.encode(), 16), data)
+    return bytes()
 
 class Info(Views):
     
@@ -71,14 +142,14 @@ class Info(Views):
         
         if form.is_valid():
             key = form.cleaned_data['key']
-            key_hash = get_key(key.encode(), 32)
+            enkripsi = request.GET.get('enkripsi')
             
             try:
-                nama_dekripsi : str = decryptAES(key_hash, base64.b64decode(user.nama.encode()), AESCHIPHER.MODE_CBC).decode()
-                email_dekripsi : str = decryptAES(key_hash, base64.b64decode(user.email.encode()), AESCHIPHER.MODE_CBC).decode()
-                tanggal_lahir_dekripsi : str = decryptAES(key_hash, base64.b64decode(user.tanggal_lahir.encode()), AESCHIPHER.MODE_CBC).decode()
-                alamat_dekripsi : str = decryptAES(key_hash, base64.b64decode(user.alamat.encode()), AESCHIPHER.MODE_CBC).decode()
-                nomor_telepon_dekripsi : str = decryptAES(key_hash, base64.b64decode(user.nomor_telepon.encode()), AESCHIPHER.MODE_CBC).decode()
+                nama_dekripsi : str = decrypt(enkripsi, key, base64.b64decode(user.nama.encode())).decode()
+                email_dekripsi : str = decrypt(enkripsi, key, base64.b64decode(user.email.encode())).decode()
+                tanggal_lahir_dekripsi : str = decrypt(enkripsi, key, base64.b64decode(user.tanggal_lahir.encode())).decode()
+                alamat_dekripsi : str = decrypt(enkripsi, key, base64.b64decode(user.alamat.encode())).decode()
+                nomor_telepon_dekripsi : str = decrypt(enkripsi, key, base64.b64decode(user.nomor_telepon.encode())).decode()
                 # string -> bytes -> bytes (encrypt) -> (b64encode) bytes -> string
                 
                 return render(request, 'info\index.html', context={
@@ -113,13 +184,13 @@ class Info(Views):
             tanggal_lahir = form.cleaned_data['tanggal_lahir']
             alamat = form.cleaned_data['alamat']
             nomor_telepon = form.cleaned_data['nomor_telepon']
+            enkripsi = request.POST.get('enkripsi')
             
-            key_hash = get_key(key.encode(), 32)
-            nama_enkripsi : bytes = encryptAES(key_hash, nama, AESCHIPHER.MODE_CBC)
-            email_enkripsi : bytes = encryptAES(key_hash, email, AESCHIPHER.MODE_CBC)
-            tanggal_lahir_enkripsi : bytes = encryptAES(key_hash, tanggal_lahir.strftime('%Y/%m/%d'), AESCHIPHER.MODE_CBC)
-            alamat_enkripsi : bytes = encryptAES(key_hash, alamat, AESCHIPHER.MODE_CBC)
-            nomor_telepon_enkripsi : bytes = encryptAES(key_hash, nomor_telepon, AESCHIPHER.MODE_CBC)
+            nama_enkripsi : bytes = encrypt(enkripsi, key, nama.encode())
+            email_enkripsi : bytes = encrypt(enkripsi, key, email.encode())
+            tanggal_lahir_enkripsi : bytes = encrypt(enkripsi, key, tanggal_lahir.strftime('%Y/%m/%d').encode())
+            alamat_enkripsi : bytes = encrypt(enkripsi, key, alamat.encode())
+            nomor_telepon_enkripsi : bytes = encrypt(enkripsi, key, nomor_telepon.encode())
             
             
             user : User = request.user
@@ -137,6 +208,8 @@ class DataPribadi(Views):
     def get(self, request : HttpRequest, *args, **kwargs):
         id = request.GET.get('id')
         key = request.GET.get('key')
+        enkripsi = request.GET.get('enkripsi')
+            
         user : User = request.user
         
         daftar_informasi_pribadi = InformasiPribadi.objects.filter(id_user=user.id)
@@ -144,12 +217,13 @@ class DataPribadi(Views):
         for informasi in daftar_informasi_pribadi:
             data_informasi = {
                 'id' : informasi.id,
-                'nama_informasi' : decryptRC4(settings.KEY_256, base64.b64decode(informasi.nama_informasi.encode())).decode()
+                'nama_informasi' : decryptRC4(get_key(settings.PUBLIC_KEY.encode(), 32), base64.b64decode(informasi.nama_informasi.encode())).decode()
             }
+            
             data = "<Encrypted>"
             if id is not None and id == str(informasi.id):
                 try:
-                    data = decryptRC4(get_key(key.encode(), 32), base64.b64decode(informasi.isi_informasi.encode())).decode()
+                    data = decrypt(enkripsi, key, base64.b64decode(informasi.isi_informasi.encode())).decode()
                 except:
                     pass
             data_informasi['isi_informasi'] = data
@@ -164,11 +238,12 @@ class DataPribadi(Views):
         key = request.POST.get('key')
         nama_informasi = request.POST.get('nama_informasi')
         isi_informasi = request.POST.get('isi_informasi')
+        enkripsi = request.POST.get('enkripsi')
         user : User = request.user
         
         id = uuid.uuid4()
-        nama_informasi_enkripsi = base64.b64encode(encryptRC4(settings.KEY_256, nama_informasi.encode())).decode()
-        isi_informasi_enkripsi = base64.b64encode(encryptRC4(get_key(key.encode(), 32), isi_informasi.encode())).decode()
+        nama_informasi_enkripsi = base64.b64encode(encryptRC4(get_key(settings.PUBLIC_KEY.encode(), 32), nama_informasi.encode())).decode()
+        isi_informasi_enkripsi = base64.b64encode(encrypt(enkripsi, key, isi_informasi.encode())).decode()
         InformasiPribadi.objects.create(
             id = id,
             id_user = user,
@@ -188,7 +263,7 @@ class File(Views):
         kumpulan_file = []
         for fi in daftar_file:
             kumpulan_file.append({
-                'nama_file' : decryptDES(get_key(settings.KEY_256, 8), base64.b64decode(fi.nama_file.encode()), DESCIPHER.MODE_CBC).decode(),
+                'nama_file' : decryptDES(get_key(settings.PUBLIC_KEY.encode(), 8), base64.b64decode(fi.nama_file.encode()), DESCIPHER.MODE_CBC).decode(),
                 'id_file' : fi.id
             })
             
@@ -199,22 +274,21 @@ class File(Views):
     def post(self, request : HttpRequest, *args, **kwargs):
         user : User = request.user
         key = request.POST['key']
+        enkripsi = request.POST['enkripsi']
         uploaded_file = request.FILES['upload_file']
         
         id = uuid.uuid4()
-        nama_file = base64.b64encode(encryptDES(get_key(settings.KEY_256, 8), uploaded_file.name, DESCIPHER.MODE_CBC)).decode()
+        nama_file = base64.b64encode(encryptDES(get_key(settings.PUBLIC_KEY.encode(), 8), uploaded_file.name.encode(), DESCIPHER.MODE_CBC)).decode()
         nama_file_fisik = uuid.uuid4()
         FileModel.objects.create(id=id, id_user=user, nama_file=nama_file, nama_file_fisik=nama_file_fisik)
 
-        self.handle_uploaded_file(uploaded_file, nama_file_fisik, key.encode())
+        self.handle_uploaded_file(uploaded_file, nama_file_fisik, enkripsi, key)
         
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
     
-    def handle_uploaded_file(self, fi, name, key):
-        encryptor = DES(get_key(key, 8), DESCIPHER.MODE_CBC)
+    def handle_uploaded_file(self, fi, name, enkripsi : str, key : str):
         with open(default_location_folder + str(name), "wb+") as destination:
-            data = StringBlock(fi.read(), 8)
-            destination.write(encryptor.encrypt(data))
+            destination.write(encrypt(enkripsi, key, fi.read()))
                 
 class Download(Views):
     
@@ -222,12 +296,12 @@ class Download(Views):
         user : User = request.user
         id = request.GET['id']
         key = request.GET['key']
+        enkripsi = request.GET['enkripsi']
         
         fi = FileModel.objects.filter(id=id).get()
         
-        decryptor = DES(get_key(key.encode(), 8), DESCIPHER.MODE_CBC)
         result = bytes()
         with open(default_location_folder + str(fi.nama_file_fisik), "rb") as destination:
-            result = decryptDES(get_key(key.encode(), 8), destination.read(), DESCIPHER.MODE_CBC)
+            result = decrypt(enkripsi, key, destination.read())
             
         return HttpResponse(result, content_type='application/octet-stream')

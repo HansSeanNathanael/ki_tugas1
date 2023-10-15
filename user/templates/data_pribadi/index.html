@@ -3,6 +3,18 @@
     <form action="" method="post">{% csrf_token %}
         <label for="key">Key Enkripsi</label>
         <input type="password" name="key" placeholder="Key" required>
+        <label for="enkripsi">Algoritma Enkripsi</label>
+        <select name="enkripsi" id="enkripsi">
+            <option value="aes-cbc" selected>AES CBC</option>
+            <option value="aes-cfb">AES CFB</option>
+            <option value="aes-ofb">AES OFB</option>
+            <option value="aes-ctr">AES CTR</option>
+            <option value="des-cbc">DES CBC</option>
+            <option value="des-cfb">DES CFB</option>
+            <option value="des-ofb">DES OFB</option>
+            <option value="des-ctr">DES CTR</option>
+            <option value="rc4">RC4</option>
+        </select>
         <label for="nama_informasi">Nama Informasi</label>
         <input type="text" name="nama_informasi" placeholder="Nama informasi" required>
         <label for="isi_informasi">Isi Informasi</label>
@@ -20,6 +32,18 @@
                     <input type="text" name="id" value="{{ data_pribadi.id }}" hidden>
                     <label for="key">Key Dekripsi</label>
                     <input type="password" name="key" required/>
+                    <label for="enkripsi">Algoritma Dekripsi</label>
+                    <select name="enkripsi" id="enkripsi">
+                        <option value="aes-cbc" selected>AES CBC</option>
+                        <option value="aes-cfb">AES CFB</option>
+                        <option value="aes-ofb">AES OFB</option>
+                        <option value="aes-ctr">AES CTR</option>
+                        <option value="des-cbc">DES CBC</option>
+                        <option value="des-cfb">DES CFB</option>
+                        <option value="des-ofb">DES OFB</option>
+                        <option value="des-ctr">DES CTR</option>
+                        <option value="rc4">RC4</option>
+                    </select>
                     <button type="submit">DECRYPT</button>
                 </form>
             </li>

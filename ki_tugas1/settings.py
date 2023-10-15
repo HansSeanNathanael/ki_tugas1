@@ -137,5 +137,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 import base64
 
-KEY_128 = base64.b64decode(b'8WCcST6oOR4EFekfhAYtBQ==')
-KEY_256 = base64.b64decode(b'WxmvhSbVfinXXr71RUkJpZx5/WiJpc29hDD2tKtCZec=')
+PUBLIC_KEY = 'KEY_PUBLIC'

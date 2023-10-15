@@ -2,6 +2,7 @@ import io
 import sys
 import collections
 from Crypto.Cipher import AES as AESCIPHER, DES as DESCIPHER, ARC4
+from Crypto.Util import Counter
 
 from ki_tugas1.commands.encryption_key import get_key
 
@@ -24,7 +25,9 @@ class StringBlock(EncryptBlock):
         
     def read(self) -> bytes|None:
         if self.block_size is None:
-            return self.data
+            data = self.data
+            self.data = None
+            return data
         
         if self.data is None or len(self.data) == 0:
             return None
@@ -72,7 +75,9 @@ class StringDecryptBlock(DecryptBlock):
         
     def read(self) -> bytes|None:
         if self.block_size is None:
-            return self.data
+            data = self.data
+            self.data = None
+            return data
         
         data = self.data[:self.block_size]
         self.data = self.data[self.block_size:]
@@ -101,11 +106,11 @@ class AES:
         if type == AESCIPHER.MODE_CBC:
             self.encryptor = AESCIPHER.new(key, AESCIPHER.MODE_CBC, get_key(key, 16))
         elif type == AESCIPHER.MODE_CFB:
-            self.encryptor = AESCIPHER.new(key, AESCIPHER.MODE_CFB, get_key(key, 16), 64)
+            self.encryptor = AESCIPHER.new(key, AESCIPHER.MODE_CFB, iv=get_key(key, 16), segment_size=64)
         elif type == AESCIPHER.MODE_OFB:
             self.encryptor = AESCIPHER.new(key, AESCIPHER.MODE_OFB, get_key(key, 16))
         elif type == AESCIPHER.MODE_CTR:
-            self.encryptor = AESCIPHER.new(key, AESCIPHER.MODE_CTR)
+            self.encryptor = AESCIPHER.new(key, AESCIPHER.MODE_CTR, counter=Counter.new(128))
     
     def encrypt(self, block_data : EncryptBlock) -> bytes:
         result = bytes()
@@ -117,6 +122,12 @@ class AES:
         return result
     
     def decrypt(self, block_data : DecryptBlock) -> bytes|None:
+        if block_data.block_size is None:
+            data = block_data.read()
+            if data is None:
+                return None
+            return self.encryptor.decrypt(data)
+        
         if self.decrypt_queue is None:
             self.decrypt_queue = collections.deque()
             
@@ -153,7 +164,7 @@ class DES:
         elif type == DESCIPHER.MODE_OFB:
             self.encryptor = DESCIPHER.new(key, DESCIPHER.MODE_OFB, get_key(key, 8))
         elif type == DESCIPHER.MODE_CTR:
-            self.encryptor = DESCIPHER.new(key, DESCIPHER.MODE_CTR)
+            self.encryptor = DESCIPHER.new(key, DESCIPHER.MODE_CTR, counter=Counter.new(64))
             
     def encrypt(self, block_data : EncryptBlock) -> bytes:
         result = bytes()
@@ -165,6 +176,12 @@ class DES:
         return result
     
     def decrypt(self, block_data : DecryptBlock) -> bytes|None:
+        if block_data.block_size is None:
+            data = block_data.read()
+            if data is None:
+                return None
+            return self.encryptor.decrypt(data)
+        
         if self.decrypt_queue is None:
             self.decrypt_queue = collections.deque()
             

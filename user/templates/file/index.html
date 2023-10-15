@@ -7,6 +7,18 @@
             <input type="file" name="upload_file" accept=".doc,.docx,.xls,.xlsx,.pdf" required>
             <label for="key">Key Enkripsi</label>
             <input type="password" name="key" placeholder="Key" required>
+            <label for="enkripsi">Algoritma Enkripsi</label>
+            <select name="enkripsi" id="enkripsi">
+                <option value="aes-cbc" selected>AES CBC</option>
+                <option value="aes-cfb">AES CFB</option>
+                <option value="aes-ofb">AES OFB</option>
+                <option value="aes-ctr">AES CTR</option>
+                <option value="des-cbc">DES CBC</option>
+                <option value="des-cfb">DES CFB</option>
+                <option value="des-ofb">DES OFB</option>
+                <option value="des-ctr">DES CTR</option>
+                <option value="rc4">RC4</option>
+            </select>
             <button type="submit">Decrypt</button>
         </form>
         <br>
@@ -19,6 +31,18 @@
                     <input type="text" name="id" value="{{ file.id_file }}" hidden>
                     <label for="key">Key Dekripsi</label>
                     <input type="password" name="key" required/>
+                    <label for="enkripsi">Algoritma Dekripsi</label>
+                    <select name="enkripsi" id="enkripsi">
+                        <option value="aes-cbc" selected>AES CBC</option>
+                        <option value="aes-cfb">AES CFB</option>
+                        <option value="aes-ofb">AES OFB</option>
+                        <option value="aes-ctr">AES CTR</option>
+                        <option value="des-cbc">DES CBC</option>
+                        <option value="des-cfb">DES CFB</option>
+                        <option value="des-ofb">DES OFB</option>
+                        <option value="des-ctr">DES CTR</option>
+                        <option value="rc4">RC4</option>
+                    </select>
                     <button type="submit" formtarget="_blank">DOWNLOAD</button>
                 </form>
             </li>
