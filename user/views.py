@@ -8,7 +8,7 @@ from Crypto.Cipher import AES as AESCHIPHER, DES as DESCIPHER
 
 from autentikasi.models import User
 from ki_tugas1.views import Views
-from ki_tugas1.encryptor.aes import AES, DES, RC4, StringBlock, StringDecryptBlock
+from ki_tugas1.encryptor.aes import AES, DES, RC4, EncryptBlock, DecryptBlock
 from ki_tugas1.commands.encryption_key import get_key
 from .models import File as FileModel, InformasiPribadi
 from .forms.form_info_get import FormInfoGet
@@ -24,9 +24,9 @@ def encryptAES(key : bytes, data : bytes, mode : any) -> bytes:
     
     data_block = None
     if mode == AESCHIPHER.MODE_CTR:
-        data_block = StringBlock(data, None)
+        data_block = EncryptBlock(data, None)
     else:
-        data_block = StringBlock(data, 16)
+        data_block = EncryptBlock(data, 16)
     
     return aes.encrypt(data_block)
     
@@ -34,26 +34,18 @@ def decryptAES(key : bytes, data : bytes, mode : any) -> bytes:
     aes = AES(key, mode)
     data_block = None
     if mode == AESCHIPHER.MODE_CTR:
-        data_block = StringDecryptBlock(data, None)
+        data_block = DecryptBlock(data, None)
     else:
-        data_block = StringDecryptBlock(data, 16)
-        
-    result = bytes()
-    while True:
-        data = aes.decrypt(data_block)
-        if data is None:
-            break
-        
-        result += data
-    return result
+        data_block = DecryptBlock(data, 16)
+    return aes.decrypt(data_block)
 
 def encryptDES(key : bytes, data : bytes, mode : any) -> bytes:
     des = DES(key, mode)
     data_block = None
     if mode == DESCIPHER.MODE_CTR:
-        data_block = StringBlock(data, None)
+        data_block = EncryptBlock(data, None)
     else:
-        data_block = StringBlock(data, 8)
+        data_block = EncryptBlock(data, 8)
     
     return des.encrypt(data_block)
 
@@ -61,17 +53,10 @@ def decryptDES(key : bytes, data : bytes, mode : any) -> bytes:
     des = DES(key, mode)
     data_block = None
     if mode == DESCIPHER.MODE_CTR:
-        data_block = StringDecryptBlock(data, None)
+        data_block = DecryptBlock(data, None)
     else:
-        data_block = StringDecryptBlock(data, 8)
-        
-    result = bytes()
-    while True:
-        data = des.decrypt(data_block)
-        if data is None:
-            break
-        result += data
-    return result
+        data_block = DecryptBlock(data, 8)
+    return des.decrypt(data_block)
 
 def encryptRC4(key : bytes, data : bytes) -> bytes:
     rc4 = RC4(key)
@@ -118,7 +103,6 @@ def decrypt(algoritma : str, key : str, data : bytes) -> bytes:
         elif mode == "ofb":
             return decryptAES(get_key(key.encode(), 16), data, AESCHIPHER.MODE_OFB)
         elif mode == "ctr":
-            print(decryptAES(get_key(key.encode(), 16), data, AESCHIPHER.MODE_CTR))
             return decryptAES(get_key(key.encode(), 16), data, AESCHIPHER.MODE_CTR)
     elif tipe_enkripsi == "des":
         mode = algoritma[4:]

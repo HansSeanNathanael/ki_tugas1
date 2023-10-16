@@ -5,12 +5,8 @@ from Crypto.Cipher import AES as AESCIPHER, DES as DESCIPHER, ARC4
 from Crypto.Util import Counter
 
 from ki_tugas1.commands.encryption_key import get_key
-
-class EncryptBlock:
-    def read(self) -> bytes|None:
-        pass
     
-class StringBlock(EncryptBlock):
+class EncryptBlock:
     def __init__(self, data : bytes, block_size : int|None):
         self.data = data
         
@@ -23,80 +19,20 @@ class StringBlock(EncryptBlock):
             self.data += bytes([ord('0')] * (self.padding))
             self.data += self.padding.to_bytes(self.block_size, byteorder=sys.byteorder, signed=False)
         
-    def read(self) -> bytes|None:
-        if self.block_size is None:
-            data = self.data
-            self.data = None
-            return data
-        
-        if self.data is None or len(self.data) == 0:
-            return None
-        data = self.data[:self.block_size]
-        self.data = self.data[self.block_size:]
-        
-        return data
-
-# class StreamBlock(EncryptBlock):
-#     def __init__(self, stream : io.BufferedReader, block_size : int|None):
-#         self.stream = stream
-#         self.padding = -1
-#         self.block_size = block_size
-    
-#     def read(self) -> bytes|None:
-#         if self.block_size is None:
-#             return self.stream.read()
-        
-#         if self.stream is None:
-#             return None
-#         if self.padding != -1:
-#             self.stream = None
-#             return self.padding.to_bytes(self.block_size, byteorder=sys.byteorder, signed=False)
-#         if not self.stream.peek(1):
-#             self.stream = None
-#             self.padding = 0
-#             return self.padding.to_bytes(self.block_size, byteorder=sys.byteorder, signed=False)
-        
-#         data = self.stream.read(self.block_size)
-#         sisa = len(data)
-#         if sisa < self.block_size:
-#             self.padding = self.block_size - sisa
-#             data += bytes([ord('0')] * (self.block_size - sisa))
-        
-#         return data 
+    def read(self) -> bytes:
+        return self.data
     
 class DecryptBlock:
-    def read(self) -> bytes|None:
-        pass
-    
-class StringDecryptBlock(DecryptBlock):
     def __init__(self, data : bytes, block_size : int|None):
         self.data = data
         self.block_size = block_size
         
-    def read(self) -> bytes|None:
-        if self.block_size is None:
-            data = self.data
-            self.data = None
-            return data
-        
-        data = self.data[:self.block_size]
-        self.data = self.data[self.block_size:]
-        if data is None or len(data) == 0:
-            return None
-        return data
+    def read(self) -> bytes:
+        return self.data
     
-class StreamDecryptBlock(DecryptBlock):
-    def __init__(self, stream : io.BufferedReader, block_size : int|None):
-        self.stream = stream
-        self.block_size = block_size
-        
-    def read(self) -> bytes|None:
-        if self.block_size is None:
-            return self.stream.read()
-        
-        return self.stream.read(self.block_size)
+    def get_block_size(self) -> int|None:
+        return self.block_size
             
-
 class AES:
     def __init__(self, key : bytes, type):
         self.encryptor = None
@@ -113,43 +49,18 @@ class AES:
             self.encryptor = AESCIPHER.new(key, AESCIPHER.MODE_CTR, counter=Counter.new(128))
     
     def encrypt(self, block_data : EncryptBlock) -> bytes:
-        result = bytes()
-        data = block_data.read()
-        while data is not None:
-            result += self.encryptor.encrypt(data)
-            data = block_data.read()
-        
-        return result
+        return self.encryptor.encrypt(block_data.read())
     
     def decrypt(self, block_data : DecryptBlock) -> bytes|None:
-        if block_data.block_size is None:
-            data = block_data.read()
-            if data is None:
-                return None
-            return self.encryptor.decrypt(data)
+        data = self.encryptor.decrypt(block_data.read())
+        if block_data.get_block_size() is None:
+            return data
         
-        if self.decrypt_queue is None:
-            self.decrypt_queue = collections.deque()
-            
-            for _ in range(2):
-                data = block_data.read()
-                data = self.encryptor.decrypt(data)
-                self.decrypt_queue.append(data)
+        block_size = block_data.get_block_size()
+        block_store_size = data[-block_size:]
+        padding = int.from_bytes(bytes=block_store_size, byteorder=sys.byteorder, signed=False)
         
-        if len(self.decrypt_queue) == 0:
-            return None
-        
-        data = self.decrypt_queue.popleft()
-        next_data = block_data.read()
-        if next_data is not None:
-            next_data = self.encryptor.decrypt(next_data)
-            self.decrypt_queue.append(next_data)
-        else:
-            padding = self.decrypt_queue.popleft()
-            panjang_data = 16 - int.from_bytes(bytes=padding, byteorder=sys.byteorder, signed=False)
-            data = data[:panjang_data]
-            
-        return data
+        return data[:-(block_size+padding)]
     
 class DES:
     def __init__(self, key : bytes, type):
@@ -167,43 +78,18 @@ class DES:
             self.encryptor = DESCIPHER.new(key, DESCIPHER.MODE_CTR, counter=Counter.new(64))
             
     def encrypt(self, block_data : EncryptBlock) -> bytes:
-        result = bytes()
-        data = block_data.read()
-        while data is not None:
-            result += self.encryptor.encrypt(data)
-            data = block_data.read()
-        
-        return result
+        return self.encryptor.encrypt(block_data.read())
     
     def decrypt(self, block_data : DecryptBlock) -> bytes|None:
-        if block_data.block_size is None:
-            data = block_data.read()
-            if data is None:
-                return None
-            return self.encryptor.decrypt(data)
+        data = self.encryptor.decrypt(block_data.read())
+        if block_data.get_block_size() is None:
+            return data
         
-        if self.decrypt_queue is None:
-            self.decrypt_queue = collections.deque()
-            
-            for _ in range(2):
-                data = block_data.read()
-                data = self.encryptor.decrypt(data)
-                self.decrypt_queue.append(data)
+        block_size = block_data.get_block_size()
+        block_store_size = data[-block_size:]
+        padding = int.from_bytes(bytes=block_store_size, byteorder=sys.byteorder, signed=False)
         
-        if len(self.decrypt_queue) == 0:
-            return None
-        
-        data = self.decrypt_queue.popleft()
-        next_data = block_data.read()
-        if next_data is not None:
-            next_data = self.encryptor.decrypt(next_data)
-            self.decrypt_queue.append(next_data)
-        else:
-            padding = self.decrypt_queue.popleft()
-            panjang_data = 8 - int.from_bytes(bytes=padding, byteorder=sys.byteorder, signed=False)
-            data = data[:panjang_data]
-            
-        return data
+        return data[:-(block_size+padding)]
     
 class RC4:
     def __init__(self, key : bytes):
