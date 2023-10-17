@@ -6,6 +6,7 @@ from Crypto.Util import Counter
 
 from ki_tugas1.commands.encryption_key import get_key
     
+    
 class EncryptBlock:
     def __init__(self, data : bytes, block_size : int|None):
         self.data = data
