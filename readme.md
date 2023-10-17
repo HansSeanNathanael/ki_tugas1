@@ -1,7 +1,8 @@
 ### Tugas 1 Keamanan Informasi
 
-Kelompok: 3
-Kelas: Keamanan Informasi (F)
+**Kelompok:** 3
+
+**Kelas:** Keamanan Informasi (F)
 
 | Nama                     | NRP         |
 |--------------------------|-------------|
