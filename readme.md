@@ -1,10 +1,9 @@
-### Tugas 1 Keamanan Informasi
+## Assignment 1: Encrypted Data Storage Web App
 
-**Kelompok:** 3
+**Group:** 3 <br />
+**Class:** Keamanan Informasi (F)
 
-**Kelas:** Keamanan Informasi (F)
-
-| Nama                     | NRP         |
+| Name                     | NRP         |
 |--------------------------|-------------|
 | Hans Sean Nathanael     | 5025201019  |
 | Nur Muhammad Ainul Yaqin| 5025201011  |
