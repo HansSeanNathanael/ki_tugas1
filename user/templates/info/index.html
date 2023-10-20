@@ -1,61 +1,79 @@
 <html>
+    <head>
+        <style>
+            .top-right {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+            }
+        </style>
+    </head>
     <body>
-        <p>Data user</p>
-        <ul>
-            <li>Username: {{ username }}</li>
-            <li>Nama: {{ nama }}</li>
-            <li>Email: {{ email }}</li>
-            <li>Tanggal lahir: {{ tanggal_lahir }}</li>
-            <li>Alamat: {{ alamat }}</li>
-            <li>Nomor telepon: {{ nomor_telepon }}</li>
-        </ul>
-
-        <p>Dekripsi</p>
-        <form action="/info/user/" method="get">{% csrf_token %}
-            <label for="key">Key Enkripsi</label>
-            <input type="password" name="key" placeholder="Key" required>
-            <label for="enkripsi">Algoritma Dekripsi</label>
-            <select name="enkripsi" id="enkripsi">
-                <option value="aes-cbc" selected>AES CBC</option>
-                <option value="aes-cfb">AES CFB</option>
-                <option value="aes-ofb">AES OFB</option>
-                <option value="aes-ctr">AES CTR</option>
-                <option value="des-cbc">DES CBC</option>
-                <option value="des-cfb">DES CFB</option>
-                <option value="des-ofb">DES OFB</option>
-                <option value="des-ctr">DES CTR</option>
-                <option value="rc4">RC4</option>
-            </select>
-            <button type="submit">Decrypt</button>
-        </form>
-        <br>
-        <p>Ubah data</p>
-        <form action="/info/user/" method="post">{% csrf_token %}
-            <label for="key">Key Enkripsi</label>
-            <input type="password" name="key" placeholder="Key" required>
-            <label for="enkripsi">Algoritma Enkripsi</label>
-            <select name="enkripsi" id="enkripsi">
-                <option value="aes-cbc" selected>AES CBC</option>
-                <option value="aes-cfb">AES CFB</option>
-                <option value="aes-ofb">AES OFB</option>
-                <option value="aes-ctr">AES CTR</option>
-                <option value="des-cbc">DES CBC</option>
-                <option value="des-cfb">DES CFB</option>
-                <option value="des-ofb">DES OFB</option>
-                <option value="des-ctr">DES CTR</option>
-                <option value="rc4">RC4</option>
-            </select>
-            <label for="nama">Nama</label>
-            <input type="text" name="nama" placeholder="Nama" required>
-            <label for="email">Email</label>
-            <input type="email" name="email" placeholder="Email" required>
-            <label for="tanggal_lahir">Tanggal Lahir</label>
-            <input type="date" name="tanggal_lahir" placeholder="Lahir" required>
-            <label for="alamat">Alamat</label>
-            <input type="text" name="alamat" placeholder="Alamat" required>
-            <label for="nomor_telepon">Nomor Telepon</label>
-            <input type="text" name="nomor_telepon" placeholder="Nomor Telepon" required>
-            <button type="submit">Simpan</button>
-        </form>
+        <div>
+            <div class="top-right">
+                <a href="/auth/login">
+                    <button type="submit">Logout</button>
+                </a>
+            </div>
+            <div>
+                <p>Data user</p>
+                <ul>
+                    <li>Username: {{ username }}</li>
+                    <li>Nama: {{ nama }}</li>
+                    <li>Email: {{ email }}</li>
+                    <li>Tanggal lahir: {{ tanggal_lahir }}</li>
+                    <li>Alamat: {{ alamat }}</li>
+                    <li>Nomor telepon: {{ nomor_telepon }}</li>
+                </ul>
+        
+                <p>Dekripsi</p>
+                <form action="/info/user/" method="get">{% csrf_token %}
+                    <label for="key">Key Enkripsi</label>
+                    <input type="password" name="key" placeholder="Key" required>
+                    <label for="enkripsi">Algoritma Dekripsi</label>
+                    <select name="enkripsi" id="enkripsi">
+                        <option value="aes-cbc" selected>AES CBC</option>
+                        <option value="aes-cfb">AES CFB</option>
+                        <option value="aes-ofb">AES OFB</option>
+                        <option value="aes-ctr">AES CTR</option>
+                        <option value="des-cbc">DES CBC</option>
+                        <option value="des-cfb">DES CFB</option>
+                        <option value="des-ofb">DES OFB</option>
+                        <option value="des-ctr">DES CTR</option>
+                        <option value="rc4">RC4</option>
+                    </select>
+                    <button type="submit">Decrypt</button>
+                </form>
+                <br>
+                <p>Ubah data</p>
+                <form action="/info/user/" method="post">{% csrf_token %}
+                    <label for="key">Key Enkripsi</label>
+                    <input type="password" name="key" placeholder="Key" required>
+                    <label for="enkripsi">Algoritma Enkripsi</label>
+                    <select name="enkripsi" id="enkripsi">
+                        <option value="aes-cbc" selected>AES CBC</option>
+                        <option value="aes-cfb">AES CFB</option>
+                        <option value="aes-ofb">AES OFB</option>
+                        <option value="aes-ctr">AES CTR</option>
+                        <option value="des-cbc">DES CBC</option>
+                        <option value="des-cfb">DES CFB</option>
+                        <option value="des-ofb">DES OFB</option>
+                        <option value="des-ctr">DES CTR</option>
+                        <option value="rc4">RC4</option>
+                    </select>
+                    <label for="nama">Nama</label>
+                    <input type="text" name="nama" placeholder="Nama" required>
+                    <label for="email">Email</label>
+                    <input type="email" name="email" placeholder="Email" required>
+                    <label for="tanggal_lahir">Tanggal Lahir</label>
+                    <input type="date" name="tanggal_lahir" placeholder="Lahir" required>
+                    <label for="alamat">Alamat</label>
+                    <input type="text" name="alamat" placeholder="Alamat" required>
+                    <label for="nomor_telepon">Nomor Telepon</label>
+                    <input type="text" name="nomor_telepon" placeholder="Nomor Telepon" required>
+                    <button type="submit">Simpan</button>
+                </form>
+            </div>
+        </div>
     </body>
 </html>
