@@ -16,8 +16,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.views.generic import RedirectView
+
+from autentikasi.views import Register  # Import the view for the register page
 
 urlpatterns = [
+    path('', Register.as_view(), name='root'),  # Map the root URL to the register view
+    path('admin/', admin.site.urls),
     path('info/', include('user.urls')),
     path('auth/', include('autentikasi.urls')),
 ]
