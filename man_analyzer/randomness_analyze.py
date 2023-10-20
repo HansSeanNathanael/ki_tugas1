@@ -1,25 +1,32 @@
 import numpy as np
 from scipy.stats import norm
-import base64
 
-# Run test counter
-def count_runs(x):
-    return np.sum(np.abs(np.diff(x)) == 1) + 1
+# Run test counter for strings
+def count_runs(s):
+    runs = 1  # start with 1 to account for the first character
+    for i in range(1, len(s)):
+        if s[i] != s[i-1]:
+            runs += 1
+    return runs
 
-# Run test script
-def runs_test(x):
-    n = len(x)
-    n1 = np.sum(x)
+# Run test script for strings
+def runs_test(s):
+    n = len(s)
+    unique_chars = set(s)
+    if len(unique_chars) != 2:
+        raise ValueError("The input string must contain exactly 2 unique characters for the runs test.")
+    
+    char1, char2 = unique_chars
+    n1 = s.count(char1)
     n2 = n - n1
 
-    tau = 2.0 / np.sqrt(n)
-    R = count_runs(x)
+    R = count_runs(s)
     R_exp = 2.0 * n1 * n2 / n + 1
     R_var = (2.0 * n1 * n2 * (2 * n1 * n2 - n)) / (n**2 * (n - 1))
 
     z = (R - R_exp) / np.sqrt(R_var)
 
-    # Menggunakan two-sided z-test
+    # Using two-sided z-test
     return z, 2 * (1 - norm.cdf(abs(z)))
 
 # Data
@@ -38,13 +45,11 @@ ciphertexts = {
 
 # Tests
 for algorithm, ciphertext in ciphertexts.items():
-    # Ciphertext to binary
-    binary_ciphertext = [int(b) for byte in base64.b64decode(ciphertext) for b in f"{byte:08b}"]
-
-    # Test
-    z, p = runs_test(binary_ciphertext)
-
-    print(f"Runs test for {algorithm}:")
-    print(f"Z-statistic: {z}")
-    print(f"P-value: {p}")
-    print()
+    try:
+        z, p = runs_test(ciphertext)
+        print(f"Runs test for {algorithm}:")
+        print(f"Z-statistic: {z}")
+        print(f"P-value: {p}")
+        print()
+    except ValueError as e:
+        print(f"Error for {algorithm}: {e}")
