@@ -1,7 +1,7 @@
 ## Assignment 1: Encrypted Data Storage Web App
 
 **Group:** 3 <br />
-**Class:** Keamanan Informasi (F)
+**Class:** Information Security (F)
 
 | Name                     | NRP         |
 |--------------------------|-------------|
